@@ -17,22 +17,17 @@ if (!empty($_POST)) {
         $error['name_mei'] = "blank";
     }
     
-    if($_SERVER['REQUEST_METHOD'] === 'POST'){
-      if (empty($_POST['gender'])){
-      $err['gender'] = true;
-   }
-}
     if ($_POST['pref_name'] === "") {
         $error['pref_name'] = "blank";
     }
-    
- 
+
     /* エラーがなければ次のページへ */
     if (!isset($error)) {
         $_SESSION['join'] = $_POST;   // フォームの内容をセッションで保存
         header('Location: check.php');   // check.phpへ移動
         exit();
     }
+
 }
 ?>
 
@@ -58,25 +53,25 @@ if (!empty($_POST)) {
             <div class="control">
             <p>氏名<label for="name_sei">
                 姓</label>
-                <input id="name_sei" type="name_sei" name="name_sei">
+                <input type="text" name="name_sei" value="<?php if( !empty($_POST['name_sei']) ){ echo $_POST['name_sei']; } ?>">
                 <?php if (!empty($error["name_sei"]) && $error['name_sei'] === 'blank'): ?>
                     <p class="error">※氏名（姓）は必須入力です</p>
                 <?php endif ?>
                 <label for="name_mei">名</label>
-                <input id="name_mei" type="name_mei" name="name_mei">
+                <input type="text" name="name_mei" value="<?php if( !empty($_POST['name_mei']) ){ echo $_POST['name_mei']; } ?>">
                 <?php if (!empty($error["name_mei"]) && $error['name_mei'] >= 20): ?>
-                <p class="error">※氏名（名）は２０文字以内で入力してください</p>
+                <p class="error">※氏名（名）は２０文字以内で入力してください </p>
                 <?php endif ?>
-                </p>
             </div>
 
             <div class="control">
                 <label for="gender">性別</label>
-                <input id="gender" type="radio" name="gender" value="male">男性
-                <input id="gender" type="radio" name="gender" value="female">女性
-                <?php if(isset($_POST['gender'])) {  
-                 echo htmlspecialchars($_POST['gender'], ENT_QUOTES, 'utf-8');
-                 }
+                <input type="radio" id="gender" name="gender" value="0" <?php if( !empty($_POST['gender']) && $_POST['gender'] === "male" ){ echo 'checked'; } ?>>男性
+                <input type="radio" id="gender" name="gender" value="1" <?php if( !empty($_POST['gender']) && $_POST['gender'] === "female" ){ echo 'checked'; } ?>>女性
+                <?php 
+                if(isset($_POST['gender'])) {  
+                echo htmlspecialchars($_POST['gender'], ENT_QUOTES, 'utf-8');
+                }
                 ?>
             </div>
             
@@ -134,20 +129,20 @@ if (!empty($_POST)) {
 'okinawa'    => '沖縄県'
 );
 ?>
-            <select name="pref_name">
+            <select name="pref_name" value="<?php if( !empty($_POST['pref_name']) && $_POST['pref_name'] === "" ){ echo 'selected'; } ?>">
             <?php foreach($prefecture as $key => $value){ ?>
-            <option value="<?php echo $key; ?>"><?php echo $value; ?></option>
+            <option value="<?php echo $value; ?>"><?php echo $value; ?></option>
             <?php } ?>
             </select>
             <br>
             <label for="address">それ以降の住所</label>
-            <input id="address" type="address" name="address">
+            <input type="text" name="address" value="<?php if( !empty($_POST['address']) ){ echo $_POST['address']; } ?>">
             </p>      
             </div>
 
             <div class="control">
             <label for="password">パスワード</label>
-            <input id="password" type="password" name="password">
+            <input id="password" type="password" name="password" value="<?php if( !empty($_POST['password']) ){ echo $_POST['password']; } ?>">
             <?php if (!empty($error["password"]) && $error['password'] === 'blank'): ?>
             <p class="error">※パスワードを入力してください</p>
             <?php endif ?>
@@ -155,7 +150,7 @@ if (!empty($_POST)) {
 
             <div class="control">
             <label for="password">パスワード確認</label>
-            <input id="password" type="password" name="password">
+            <input id="password" type="password" name="password" value="<?php if( !empty($_POST['password']) ){ echo $_POST['password']; } ?>">
             <?php if (!empty($error["password"]) && $error['password'] === 'blank'): ?>
             <p class="error">※パスワードを入力してください</p>
             <?php endif ?>
@@ -163,7 +158,7 @@ if (!empty($_POST)) {
 
             <div class="control">
             <label for="email">メールアドレス</label>
-            <input id="email" type="email" name="email">
+            <input id="email" type="email" name="email" value="<?php if( !empty($_POST['email']) ){ echo $_POST['email']; } ?>">
             <?php if (!empty($error["password"]) && $error['password'] === 'blank'): ?>
             <p class="error">※メールアドレスを入力してください</p>
             <?php endif ?>

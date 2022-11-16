@@ -13,33 +13,33 @@ if (!empty($_POST['check'])) {
     $hash = password_hash($_SESSION['join']['password'], PASSWORD_BCRYPT);
 
     // 入力情報をデータベースに登録
-    $statement = $db->prepare("INSERT INTO prdate SET name=?, email=?, password=?");
+    $statement = $db->prepare("INSERT INTO prdate SET id=?, name_sei=?, name_mei=?, gender=?,
+pref_name=?, address=?, email=?, password=?, created_at=NOW(),  updated_at=NOW(), deleted_at=NOW()");
     $statement->execute(array(
-    $_SESSION['join']['name'],
+    $_SESSION['join']['name_sei'],
+    $_SESSION['join']['name_mei'],
+    $_SESSION['join']['gender'],
+    $_SESSION['join']['pref_name'],
+    $_SESSION['join']['address'],
+    $_SESSION['join']['password'],
     $_SESSION['join']['email'],
     $hash
     ));
 
-    unset($_SESSION['join']);   // セッションを破棄
-    header('Location: thank.php');   // thank.phpへ移動
+    header('Location: thanks.php');   // thank.phpへ移動
     exit();
 }
 ?>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="	utf8mb4">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0">
     <title>会員情報確認画面</title>
-    <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
-    <link href="https://unpkg.com/sanitize.css" rel="stylesheet"/>
-    <link rel="stylesheet" href="css/style.css">
+    <link href="http://153.126.213.22/php/member_regist.php" rel="stylesheet"/>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <?php 
-    echo "<div class=content>";
-    echo "</div>";
-    ?>
     <div class="content">
         <form action="" method="POST">
             <input type="hidden" name="check" value="checked">
@@ -51,20 +51,43 @@ if (!empty($_POST['check'])) {
 
             <div class="control">
                 <p>氏名
-                echo $(name_sei) .</div> $(name_mei)
+                <?php echo $name = $_SESSION['join']['name_sei'].$_SESSION['join']['name_mei'];//結合
+                echo "<br/>\n"; 
+                ?>
                 </p>
             </div>
 
+            <div class="control"> 
+            <p>性別
+		    <?php if($_SESSION['join']['gender'] === "0" ){ echo '男性'; }
+		    else{ echo '女性'; } ?></p>
+	        </div>
+
             <div class="control">
-                <p>メールアドレス</p>
-                <p><span class="fas fa-angle-double-right"></span> <span class="check-info"><?php echo htmlspecialchars($_SESSION['join']['email'], ENT_QUOTES); ?></span></p>
+                <p>住所
+                <?php echo htmlspecialchars($_SESSION['join']['pref_name'].$_SESSION['join']['address']); ?></p>
+            </div>
+
+            <div class="control">
+            <p>パスワード
+    <span class="check">セキュリティのため非表示</span></p>
+            </div>
+
+            <div class="control">
+                <p>メールアドレス
+                <?php echo htmlspecialchars($_SESSION['join']['email'], ENT_QUOTES); ?></p>
             </div>
             
             <br>
             <button type="submit" class="btn next-btn">登録完了</button>
             <br>
-            <a href="entry.php" class="back-btn">前に戻る</a>
-            <div class="clear"></div>
+            <input type="button" onclick=history.back() value="前に戻る" class="button02"></button>
+            <input type="hidden" name="name_sei" value="<?php echo $_SESSION['join']['name_sei']; ?>">
+            <input type="hidden" name="name_mei" value="<?php echo $_SESSION['join']['name_mei']; ?>">
+            <input type="hidden" name="gender" value="<?php echo $_SESSION['join']['gender']; ?>">
+            <input type="hidden" name="pref_name" value="<?php echo $_SESSION['join']['pref_name']; ?>">
+            <input type="hidden" name="address" value="<?php echo $_SESSION['join']['address']; ?>">
+	        <input type="hidden" name="email" value="<?php echo $_SESSION['join']['email']; ?>">
         </form>
     </div>
 </body>

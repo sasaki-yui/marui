@@ -1,7 +1,7 @@
 <?php 
-    require("../dbconnect02.php");
+    require("../dbconnect.php");
     session_start();
-    
+
     if (!empty($_POST)) {
         if ($_POST['title'] === "") {
             $error['title'] = "blank";
@@ -9,14 +9,14 @@
         if (strlen($_POST['title'])> 101) {
             $error['title'] = 'length';
         }
-
-if (!empty($_POST)) {
-    if ($_POST['comment'] === "") {
-        $error['comment'] = "blank";
-    }
-    if (strlen($_POST['comment'])> 501) {
-        $error['comment'] = 'length';
-    }
+        
+    if (!empty($_POST)) {
+        if ($_POST['comment'] === "") {
+            $error['comment'] = "blank";
+        }
+        if (strlen($_POST['comment'])> 501) {
+            $error['comment'] = 'length';
+        }
 
     if (!isset($error)) {
         $_SESSION['join'] = $_POST;
@@ -46,7 +46,7 @@ if (!empty($_POST)) {
             <h1>スレッド作成フォーム</h1>
             <br>
             <div class="control">
-                <label for="title">スレッドタイトル</label>
+                <label for="title">スレッドタイトル
                         <input type="text" name="title" value="<?php if( !empty($_POST['title']) ){ echo $_POST['title']; } ?>">
                             <?php if (!empty($error['title']) && ($error['title'] == "blank")): ?>
                                 <p class="error">※タイトルを入力してください</p>
@@ -54,15 +54,24 @@ if (!empty($_POST)) {
                             <?php if (isset($error['title']) && ($error['title'] == "length")): ?>
                                 <p class="error"> ※タイトルは100文字以内で入力してください</p>
                             <?php endif ?>
-
-                <label for="comment">コメント</label>
-                        <textarea rows="10" cols="60"><?php if( !empty($_POST['comment']) ){ echo $_POST['name_mei']; } ?></textarea>
+                </label>
+            <br>
+            <br>
+                <label for="comment">コメント
+                        <textarea name="comment" rows="10" cols="50" wrap="hard"><?php if(!empty($_POST['comment']) ){ echo nl2br($_POST['comment']); } ?></textarea>
                             <?php if (!empty($error["comment"]) && $error['comment'] === 'blank'): ?>
                                 <p class="error">※コメントを入力してください</p>
                             <?php endif ?>
                             <?php if (isset($error['comment']) && ($error['comment'] == "length")): ?>
                                 <p class="error"> ※コメントは500文字以内で入力してください</p>
-                            <?php endif ?> 
+                            <?php endif ?>
+                </label>
+            </div>
+            
+            <div class="control">
+                <button type="submit" class="btn">確認画面へ</button>
+                <br>
+                <button type="button" onclick="location.href='top.php'" class="button02">トップに戻る</button> 
             </div>
         </form>
     </div>

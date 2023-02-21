@@ -1,5 +1,7 @@
 <?php 
-    require("../dbconnect.php");
+    require("dbconnect.php");
+    //本番環境　require("dbconnect.php");
+    //開発環境　require("../dbconnect.php");
     session_start();
 
     if (!empty($_POST)) {

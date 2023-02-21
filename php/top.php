@@ -1,6 +1,8 @@
 <?php
 session_start();
-require("../dbconnect.php");
+require("dbconnect.php");
+//本番環境　require("dbconnect.php");
+//開発環境　require("../dbconnect.php");
 
 if (isset($_SESSION['id']) && isset($_SESSION['name_sei']) || isset($_SESSION['name_mei'])) {
     $name_sei = $_SESSION['name_sei'];
@@ -8,6 +10,8 @@ if (isset($_SESSION['id']) && isset($_SESSION['name_sei']) || isset($_SESSION['n
 } else {
     header('Location: login.php');
     exit();
+
+    var_dump($_SESSION['id']);
 }
 
 ?>
@@ -24,13 +28,21 @@ if (isset($_SESSION['id']) && isset($_SESSION['name_sei']) || isset($_SESSION['n
 <body>
     <div class="menu">
         <ul id="nav">
-            <li><a href="http://localhost/php/logout.php">ログアウト</a></li>
-            <li><a href="http://localhost/php/thread_regist.php">新規スレッド作成</a></li>
+            <li><a href="http://153.126.213.22/php/logout.php">ログアウト</a></li>
+            <li><a href="http://153.126.213.22/php/thread_regist.php">新規スレッド作成</a></li>
+            <li><a href="http://153.126.213.22/php/thread.php">スレッド一覧</a></li>
             <li>ようこそ、<?php echo ($name_sei).($name_mei); ?>様</li>
         </ul>
     </div>    
     <div class="content">
         <h1>○○掲示板</h1>
+    </div>
+    <form action="" method="POST" <?php if (!isset($_SESSION['id']))  :?>class="hidden-form" <?php endif ;?>>
+    <input type="hidden" value="<?=$member_id?>" name="member_id">
+    <div class="menu">
+    <ul id="nav">
+    <li><a href="http://153.126.213.22/php/member_withdrawal.php">退会</a></li>
+    </ul>
     </div>
 </body>
 </html>

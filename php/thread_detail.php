@@ -1,6 +1,8 @@
 <?php 
     session_start();
-    require("../dbconnect.php");
+    require("dbconnect.php");
+//本番環境　require("dbconnect.php");
+//開発環境　require("../dbconnect.php");
 
     //threadsテーブルより$threadsを取得
     $url = $_SERVER['REQUEST_URI'];
@@ -67,23 +69,36 @@
     $pre=$sql->fetchAll();
 
     $disp_data = array_slice($pre, $start_no, MAX, true);
+    
+    //いいねの重複チェック
+    if (isset($_POST['like']) && isset($_POST['member_id']) && isset($_POST['coments_id'])) {
+        $mem_id = (int)$_POST['member_id'];
+        $com_id = (int)$_POST['coments_id'];
 
-    //いいね機能
-// if (isset($_POST['like'])) {
-//     //2-1いいねを押したメッセージの投稿者を調べる
-//     $member_id = $_POST['member_id'];
-//     $coments_id = $_POST['coments_id'];
+        $like_mem = $db->prepare("SELECT id FROM likese WHERE coments_id='".$com_id."'");
+        $like_mem->execute();
+        $like_member=$like_mem->fetchColumn();
+        //本番環境のときはfetchにしてた
+        //member_id='".$mem_id."'もWHERE条件に入れていたが、消した
 
-//     $member = $db->prepare("SELECT COUNT(*) AS cnt FROM likese WHERE member_id='".$member_id." AND coments_id=".$coments_id."'");
-//     $member->execute(array($_POST['like']));
-//     $record = $member->fetch();
-//     if ($record['cnt'] > 0) {
-//         $error['like'] = 'duplicate';
-//     }
-// }
-
-    $id = 3;
-
+        //重複していたらいいね削除・それ以外はデータ挿入
+        if (isset($_SESSION['id'])) {
+            $id = $like_member;
+            //本番環境のときは$like_member["id"]にしてた
+        
+            if (!empty($like_member)) {
+                $delete = $db->prepare("DELETE FROM likese WHERE id=?");
+                $delete->bindValue(1, $id);
+                $delete->execute();
+            } else {
+                $like = $db->prepare("INSERT INTO likese SET member_id=?, coments_id=?");
+                $like->execute(array(
+                    $mem_id,
+                    $com_id
+                ));
+            }
+        }
+    }
 ?>
 
 <!DOCTYPE html>
@@ -144,24 +159,11 @@
                         <div><?php echo $value['comment']; ?></div>
                         <br>
                         <form action="" method="POST">
-                        <input type="hidden" value="<?=$member_id?>" name="member_id">
-                        <input type="hidden" value="<?=$value['id']?>" name="coments_id">
-                        <!-- foreachの中のlikeが押された値だけ送りたいのに、foreachの中の値全てが送られてしまう -->
-                        <button type="submit" name="like" value="">♡</button>
-                        <?php
-                        if (isset($_POST['like'])) {
-                            $delete = $db->prepare('DELETE FROM likese WHERE id=:id');
-                            $delete->execute(array());
-                        }else{
-                            $like = $db->prepare('INSERT INTO likese SET member_id=?, coments_id=?');
-                            $like->execute(array(
-                            $member_id,
-                            $value['id']
-                            ));
-                        }
-                        ?>
-                        <?php echo $like_count; ?>
+                            <input type="hidden" value="<?=$member_id?>" name="member_id">
+                            <input type="hidden" value="<?=$value['id']?>" name="coments_id">
+                            <button type="submit" name="like" value="">♡</button>
                         </form>
+                        <?php echo $like_count; ?>
                         </div>
                         <br>
                         <?php endforeach ; ?>

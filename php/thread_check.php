@@ -1,6 +1,8 @@
 <?php
 session_start();
-require("../dbconnect.php");
+require("dbconnect.php");
+//本番環境　require("dbconnect.php");
+//開発環境　require("../dbconnect.php");
 
     if (!isset($_SESSION['join'])) {
         header('Location: thread_regist.php');

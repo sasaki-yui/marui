@@ -1,3 +1,27 @@
+<?php
+session_start();
+    $token = isset($_POST["token"]) ? $_POST["token"] : "";
+    $session_token = isset($_SESSION["token"]) ? $_SESSION["token"] : "";
+
+        // POSTされたトークンとセッション変数のトークンの比較
+        if($token != "" && $token == $session_token) {
+            // 登録画面送信データの登録を行う
+            echo"";
+        } else {
+            echo"";
+        }
+
+        // セッションに保存しておいたトークンの削除
+        unset($_SESSION['token']);
+        // セッションの保存
+        session_write_close();
+        // セッションの再開
+        session_start();
+
+        // ↓ここにフォームで行う処理を書く
+
+?>
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -11,6 +35,8 @@
     <div class="content">
         <h1>会員登録完了</h1>
         <p>会員登録が完了しました。</p>
+<br>
+        <button type="button" onclick="location.href='top.php'" class="button">トップに戻る</button> 
     </div>
 </body>
 </html>

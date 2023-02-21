@@ -1,34 +1,37 @@
 <?php 
-require("dbconnect.php");
-// require("../dbconnect.php");
-// require("./php/dbconnect.php");
-session_start();
- 
+  require("dbconnect.php");
+//本番環境　require("dbconnect.php");
+//開発環境　require("../dbconnect.php");
+    session_start();
+   
 if (!empty($_POST)) {
-    /* 入力情報の不備を検知 */    
+    /* 入力情報の不備を検知 */
     if ($_POST['name_sei'] === "") {
         $error['name_sei'] = "blank";
     }
-    if (strlen($_POST['name_sei'] )> 20 ) {
+    if (strlen($_POST['name_sei'])> 20) {
         $error['name_sei'] = 'length';
     }
 
     if ($_POST['name_mei'] === "") {
         $error['name_mei'] = "blank";
     }
-    if (strlen($_POST['name_mei'] )> 20 ) {
+    if (strlen($_POST['name_mei'])> 20) {
         $error['name_mei'] = 'length';
     }
 
-    if ($_POST['pref_id'] == "0") {
+    if (!isset($_POST['gender'])) {
+        $_POST['gender'] = 'bar';
+    }
+    if (!isset($_POST['gender']) || (!($_POST['gender'] == '1')) && (!($_POST['gender'] == '2'))) {
+        $error['gender'] = 'not_selected';
+    }
+
+    if ($_POST['pref_id'] =='0') {
         $error['pref_id'] = 'not_selected';
     }
 
-    var_dump($_POST['pref_id']);
-    var_dump($error['pref_id'] );
-
-
-    if (strlen($_POST['address'] )> 100 ) {
+    if (strlen($_POST['address'])> 100) {
         $error['address'] = 'length';
     }
 
@@ -36,20 +39,32 @@ if (!empty($_POST)) {
         $error['password'] = "blank";
     }
 
-    if (strlen($_POST['password'] )> 20 ) {
+    if (strlen($_POST['password'])> 20) {
         $error['password'] = 'length';
     }
 
-    if (strlen($_POST['password'] )< 8 ) {
+    if (strlen($_POST['password'])< 8) {
         $error['password'] = 'length';
-    }
-
-    if (($_POST['password'] != $_POST['password2']) && ($_POST['password2'] != "")){
-        $error['password2'] = 'difference';
     }
 
     if (preg_match('/[^A-Za-z0-9]/', $_POST['password'])) {
         $error['password'] = 'include';
+    }
+
+    if ($_POST['password2'] === "") {
+        $error['password2'] = "blank";
+    }
+
+    if (strlen($_POST['password2'])> 20) {
+        $error['password2'] = 'length';
+    }
+
+    if (strlen($_POST['password2'])< 8) {
+        $error['password2'] = 'length';
+    }
+
+    if (($_POST['password'] != $_POST['password2']) && ($_POST['password2'] != "")) {
+        $error['password2'] = 'difference';
     }
 
     if (preg_match('/[^A-Za-z0-9]/', $_POST['password2'])) {
@@ -60,7 +75,7 @@ if (!empty($_POST)) {
         $error['email'] = "blank";
     }
 
-    if (strlen($_POST['email'] )> 200 ) {
+    if (strlen($_POST['email'])> 200) {
         $error['email'] = 'length';
     }
 
@@ -68,14 +83,20 @@ if (!empty($_POST)) {
         $error['email'] = "include";
     }
 
-    /* エラーがなければ次のページへ */
-    if (!isset($error)) {
-        $_SESSION['join'] = $_POST;   // フォームの内容をセッションで保存
-        header('Location: check.php');   // check.phpへ移動
-        exit();
-    }
+    $member = $db->prepare('SELECT COUNT(*) AS cnt FROM prdate WHERE email=?');
+    $member->execute(array($_POST['email']));
+    $record = $member->fetch();
+    if ($record['cnt'] > 0) {
+    $error['email'] = 'duplicate';
+    }   
 
-}
+        /* エラーがなければ次のページへ */
+        if (!isset($error)) {
+            $_SESSION['join'] = $_POST;   // フォームの内容をセッションで保存
+            header('Location: check.php');   // check.phpへ移動
+            exit();
+        }
+    }
 ?>
 
 <!DOCTYPE html>
@@ -86,7 +107,7 @@ if (!empty($_POST)) {
     <title>会員登録フォーム</title>
     <link href="http://153.126.213.22/php/member_regist.php" rel="stylesheet"/>
     <link rel="stylesheet" href="style.css">
-    </head>
+</head>
 <body>
     <?php
     echo "<div class=content>";
@@ -96,168 +117,172 @@ if (!empty($_POST)) {
         <form action="" method="POST">
             <h1>会員情報登録フォーム</h1>
             <br>
-
             <div class="control">
-            <p>氏名<label for="name_sei">
-                姓</label>
-                <input type="text" name="name_sei" value="<?php if( !empty($_POST['name_sei']) ){ echo $_POST['name_sei']; } ?>">
-                <?php if (!empty($error['name_sei']) && ($error['name_sei'] == "blank")): ?>
-                <p class="error">※氏名（姓）は必須入力です</p>
-                <?php endif ?>
-                <?php if (isset($error['name_sei']) && ($error['name_sei'] == "length")): ?>
-                <p class="error"> ※氏名（姓）は20文字以内で入力してください</p>
-                <?php endif ?>
+                <p>氏名
+                    <label for="name_sei">姓</label>
+                        <input type="text" name="name_sei" value="<?php if( !empty($_POST['name_sei']) ){ echo $_POST['name_sei']; } ?>">
+                            <?php if (!empty($error['name_sei']) && ($error['name_sei'] == "blank")): ?>
+                                <p class="error">※氏名(姓)は必須入力です</p>
+                            <?php endif ?>
+                            <?php if (isset($error['name_sei']) && ($error['name_sei'] == "length")): ?>
+                                <p class="error"> ※氏名(姓)は20文字以内で入力してください</p>
+                            <?php endif ?>
 
-                <label for="name_mei">名</label>
-                <input type="text" name="name_mei" value="<?php if( !empty($_POST['name_mei']) ){ echo $_POST['name_mei']; } ?>">
-                <?php if (!empty($error["name_mei"]) && $error['name_mei'] === 'blank'): ?>
-                <p class="error">※氏名（名）は必須入力です</p>
-                <?php endif ?>
-                <?php if (isset($error['name_mei']) && ($error['name_mei'] == "length")): ?>
-                <p class="error"> ※氏名（名）は20文字以内で入力してください</p>
-                <?php endif ?> 
+                    <label for="name_mei">名</label>
+                        <input type="text" name="name_mei" value="<?php if( !empty($_POST['name_mei']) ){ echo $_POST['name_mei']; } ?>">
+                            <?php if (!empty($error["name_mei"]) && $error['name_mei'] === 'blank'): ?>
+                            <p class="error">※氏名（名）は必須入力です</p>
+                            <?php endif ?>
+                            <?php if (isset($error['name_mei']) && ($error['name_mei'] == "length")): ?>
+                            <p class="error"> ※氏名(名)は20文字以内で入力してください</p>
+                            <?php endif ?> 
             </div>
 
             <div class="control">
-                <label for="gender">性別</label>
-                <input type="radio" id="gender" name="gender" value="0" <?php if( !empty($_POST['gender']) && $_POST['gender'] === "male" ){ echo 'checked'; } ?>>男性
-                <input type="radio" id="gender" name="gender" value="1" <?php if( !empty($_POST['gender']) && $_POST['gender'] === "female" ){ echo 'checked'; } ?>>女性
-                <?php 
-                if(isset($_POST['gender'])) {  
-                echo htmlspecialchars($_POST['gender'], ENT_QUOTES, 'utf-8');
-                } ?> 
-                <?php if (isset($error['gender']) && ($error['gender'] == "0")): ?>
-                <p class="error"> ※性別を選択してください</p>
-                <?php endif ?> 
-    
-                
+                <p>性別
+                    <label for="gender">
+                        <input type="radio" name="gender" value="1" <?php if( !empty($_POST['gender']) && $_POST['gender'] === "male" ){ echo 'checked'; } ?>>男性
+                        <input type="radio" name="gender" value="2" <?php if( !empty($_POST['gender']) && $_POST['gender'] === "female" ){ echo 'checked'; } ?>>女性
+                    </label>
+                        <?php if (isset($error['gender']) && ($error['gender'] == 'not_selected')): ?>
+                        <p class="error"> ※性別を選択してください</p>
+                        <?php endif ?>
+                </p>
+            </div>
+                        
+            <div class="control">
+                <p>住所<label for="pref_id"> 都道府県</label>
+                    <?php
+                    $prefecture = array(
+                        '1'=>'北海道',
+                        '2'=>'青森県',
+                        '3'=>'岩手県',
+                        '4'=>'宮城県',
+                        '5'=>'秋田県',
+                        '6'=>'山形県',
+                        '7'=>'福島県',
+                        '8'=>'茨城県',
+                        '9'=>'栃木県',
+                        '10'=>'群馬県',
+                        '11'=>'埼玉県',
+                        '12'=>'千葉県',
+                        '13'=>'東京都',
+                        '14'=>'神奈川県',
+                        '15'=>'新潟県',
+                        '16'=>'富山県',
+                        '17'=>'石川県',
+                        '18'=>'福井県',
+                        '19'=>'山梨県',
+                        '20'=>'長野県',
+                        '21'=>'岐阜県',
+                        '22'=>'静岡県',
+                        '23'=>'愛知県',
+                        '24'=>'三重県',
+                        '25'=>'滋賀県',
+                        '26'=>'京都府',
+                        '27'=>'大阪府',
+                        '28'=>'兵庫県',
+                        '29'=>'奈良県',
+                        '30'=>'和歌山県',
+                        '31'=>'鳥取県',
+                        '32'=>'島根県',
+                        '33'=>'岡山県',
+                        '34'=>'広島県',
+                        '35'=>'山口県',
+                        '36'=>'徳島県',
+                        '37'=>'香川県',
+                        '38'=>'愛媛県',
+                        '39'=>'高知県',
+                        '40'=>'福岡県',
+                        '41'=>'佐賀県',
+                        '42'=>'長崎県',
+                        '43'=>'熊本県',
+                        '44'=>'大分県',
+                        '45'=>'宮崎県',
+                        '46'=>'鹿児島県',
+                        '47'=>'沖縄県'
+                        );
+                        ?>
+                        <select name="pref_id">
+                            <option value='0'>選択してください</option>
+                            <?php foreach($prefecture as $key => $value){ ?>
+                                <option value="<?php echo $key?>"
+                                    <?php
+                                    if( !empty($_POST['pref_id']) && $_POST['pref_id'] === "" ){ echo 'selected'; }
+                                    ?>>
+                                    <?php echo $value; ?>
+                                </option>
+                                <?php 
+                            } ?>
+                        </select>
+
+                        <?php if (isset($error['pref_id']) && ($error['pref_id'] == 'not_selected')): ?>
+                        <p class="error">※都道府県は必須入力です</p>
+                        <?php endif ?>
+
+                <br>
+                            <label for="address">それ以降の住所</label>
+                            <input type="text" name="address" value="<?php if( !empty($_POST['address']) ){ echo $_POST['address']; } ?>">
+                </p>
+                    <?php if (isset($error['address']) && ($error['address'] == "length")): ?>
+                        <p class="error"> ※100文字以内で入力してください</p>
+                    <?php endif ?>      
+            </div>
+
+            <div class="control">
+                <label for="password">パスワード</label>
+                    <input id="password" type="password" name="password" value="<?php if( !empty($_POST['password']) ){ echo $_POST['password']; } ?>">
+                        <?php if (!empty($error["password"]) && $error['password'] === 'blank'): ?>
+                            <p class="error">※パスワードを入力してください</p>
+                        <?php endif ?>
+                        <?php if (isset($error['password']) && ($error['password'] == "length")): ?>
+                            <p class="error"> ※パスワードは8~20文字以内で入力してください</p>
+                        <?php endif ?>
+                        
+                        <?php if (isset($error['password']) && ($error['password'] == "include")): ?>
+                            <p class="error"> ※半角英数字で入力してください</p>
+                        <?php endif; ?>     
+            </div>
+
+            <div class="control">
+                <label for="password2">パスワード確認</label>
+                    <input id="password2" type="password" name="password2" value="<?php if( !empty($_POST['password2']) ){ echo $_POST['password2']; } ?>">
+                        <?php if (!empty($error["password2"]) && $error['password2'] === 'blank'): ?>
+                        <p class="error">※パスワードを入力してください</p>
+                        <?php endif ?>
+                        <?php if (isset($error['password2']) && ($error['password2'] == "length")): ?>
+                        <p class="error"> ※パスワードは8~20文字以内で入力してください</p>
+                        <?php endif ?>
+                        <?php if (isset($error['password2']) && ($error['password2'] == "difference")): ?>
+                        <p class="error"> ※パスワードが一致しません</p>
+                        <?php endif; ?>
+                        </p>
+                        <?php if (isset($error['password2']) && ($error['password2'] == "include")): ?>
+                        <p class="error"> ※半角英数字で入力してください</p>
+                        <?php endif; ?>
+            </div>
+
+            <div class="control">
+                <label for="email">メールアドレス</label>
+                    <input id="email" type="email" name="email" value="<?php if( !empty($_POST['email']) ){ echo $_POST['email']; } ?>">
+                        <?php if (!empty($error["email"]) && $error['email'] === 'blank'): ?>
+                        <p class="error">※メールアドレスを入力してください</p>
+                        <?php endif ?>
+                        <?php if (isset($error['email']) && ($error['email'] == "length")): ?>
+                        <p class="error"> ※メールアドレスは200文字以内で入力してください</p>
+                        <?php endif ?>    
+                        <?php if (isset($error['email']) && ($error['email'] == "include")): ?>
+                        <p class="error"> ※メールアドレスの形式で入力してください</p>
+                        <?php endif; ?>
+                        <?php if (isset($error['email']) && ($error['email'] == 'duplicate')): ?>
+                        <p class="error"> ※このメールアドレスは既に登録されています</p>
+                        <?php endif; ?>
             </div>
             
             <div class="control">
-            <p>住所<label for="pref_id"> 都道府県</label>
-            <?php
-            $prefecture = array(
-    '0'=>'選択してください',
-    '1'=>'北海道',
-    '2'=>'青森県',
-    '3'=>'岩手県',
-    '4'=>'宮城県',
-    '5'=>'秋田県',
-    '6'=>'山形県',
-    '7'=>'福島県',
-    '8'=>'茨城県',
-    '9'=>'栃木県',
-    '10'=>'群馬県',
-    '11'=>'埼玉県',
-    '12'=>'千葉県',
-    '13'=>'東京都',
-    '14'=>'神奈川県',
-    '15'=>'新潟県',
-    '16'=>'富山県',
-    '17'=>'石川県',
-    '18'=>'福井県',
-    '19'=>'山梨県',
-    '20'=>'長野県',
-    '21'=>'岐阜県',
-    '22'=>'静岡県',
-    '23'=>'愛知県',
-    '24'=>'三重県',
-    '25'=>'滋賀県',
-    '26'=>'京都府',
-    '27'=>'大阪府',
-    '28'=>'兵庫県',
-    '29'=>'奈良県',
-    '30'=>'和歌山県',
-    '31'=>'鳥取県',
-    '32'=>'島根県',
-    '33'=>'岡山県',
-    '34'=>'広島県',
-    '35'=>'山口県',
-    '36'=>'徳島県',
-    '37'=>'香川県',
-    '38'=>'愛媛県',
-    '39'=>'高知県',
-    '40'=>'福岡県',
-    '41'=>'佐賀県',
-    '42'=>'長崎県',
-    '43'=>'熊本県',
-    '44'=>'大分県',
-    '45'=>'宮崎県',
-    '46'=>'鹿児島県',
-    '47'=>'沖縄県'
-);
-?>
-            <select name="pref_id">
-                <?php foreach($prefecture as $key => $value){ ?>
-                <option value="<?php
-                                if( !empty($_POST['pref_id']) && $_POST['pref_id'] === "" ){ echo 'selected'; }
-                                else{
-                                    echo $key;
-                                }
-                                ?>"
-                ><?php echo $value; ?></option>
-                <?php } ?>
-           </select>
-        <?php if ( isset($error['pref_id']) && ($error['pref_id'] == 'not_selected') ): ?>
-          <p class="error">※都道府県は必須入力です</p>
-        <?php endif ?>
-            <br>
-            <label for="address">それ以降の住所</label>
-            <input type="text" name="address" value="<?php if( !empty($_POST['address']) ){ echo $_POST['address']; } ?>">
-            </p>
-            <?php if (isset($error['address']) && ($error['address'] == "length")): ?>
-            <p class="error"> ※それ以降の住所は100文字以内で入力してください</p>
-            <?php endif ?>      
-            </div>
-
-            <div class="control">
-            <label for="password">パスワード</label>
-            <input id="password" type="password" name="password" value="<?php if( !empty($_POST['password']) ){ echo $_POST['password']; } ?>">
-            <?php if (!empty($error["password"]) && $error['password'] === 'blank'): ?>
-            <p class="error">※パスワードを入力してください</p>
-            <?php endif ?>
-            <?php if (isset($error['password']) && ($error['password'] == "length")): ?>
-            <p class="error"> ※パスワードは8~20文字以内で入力してください</p>
-            <?php endif ?>
-            <?php if (isset($error['password']) && ($error['password'] == "include")): ?>
-            <p class="error"> ※半角英数字で入力してください</p>
-            <?php endif; ?>     
-            </div>
-
-            <div class="control">
-            <label for="password">パスワード確認</label>
-            <input id="password" type="password" name="password2" value="<?php if( !empty($_POST['password2']) ){ echo $_POST['password']; } ?>">
-            <?php if (!empty($error["password2"]) && $error['password2'] === 'blank'): ?>
-            <p class="error">※パスワードを入力してください</p>
-            <?php endif ?>
-            <?php if (isset($error['password2']) && ($error['password2'] == "length")): ?>
-            <p class="error"> ※パスワードは8~20文字以内で入力してください</p>
-            <?php endif ?>
-            <?php if (isset($error['password2']) && ($error['password2'] == "difference")): ?>
-            <p class="error"> ※パスワードが一致しません</p>
-            <?php endif; ?>
-            </p>
-            <?php if (isset($error['password2']) && ($error['password2'] == "include")): ?>
-            <p class="error"> ※半角英数字で入力してください</p>
-            <?php endif; ?>
-            </div>
-
-            <div class="control">
-            <label for="email">メールアドレス</label>
-            <input id="email" type="email" name="email" value="<?php if( !empty($_POST['email']) ){ echo $_POST['email']; } ?>">
-            <?php if (!empty($error["email"]) && $error['email'] === 'blank'): ?>
-            <p class="error">※メールアドレスを入力してください</p>
-            <?php endif ?>
-            <?php if (isset($error['email']) && ($error['email'] == "length")): ?>
-            <p class="error"> ※メールアドレスは200文字以内で入力してください</p>
-            <?php endif ?>    
-            <?php if (isset($error['email']) && ($error['email'] == "include")): ?>
-            <p class="error"> ※メールアドレスの形式で入力してください</p>
-            <?php endif; ?>
-            </div>
- 
-            <div class="control">
-            <button type="submit" class="btn">確認画面へ</button>
+                <button type="submit" class="btn">確認画面へ</button>
+                <br>
+                <button type="button" onclick="location.href='logout.php'" class="button02">トップに戻る</button> 
             </div>
         </form>
     </div>

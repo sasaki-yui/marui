@@ -7,20 +7,8 @@ body {
   .error {
       color: red;
   }
-
-  .hidden-form {
-    display: none;
-    margin: 20px 0;
-  }
   
   #nav {
-    list-style: none;
-    background-color:#FBE4D5;
-    overflow: hidden;
-    margin: 0;
-  }
-
-  #nav02 {
     list-style: none;
     background-color:#FBE4D5;
     overflow: hidden;
@@ -41,17 +29,6 @@ body {
     margin: 30px 10px;
   }
 
-  #nav02 li a {
-    text-align: center;
-    float: right;
-    text-decoration: none;
-    color: black;
-    display: block;
-    font-weight: bold;
-    border: 2px solid #333;
-    margin: 100px 10px;
-  }
-  
   .content {
     text-align: center;
   }
@@ -76,29 +53,4 @@ body {
 
 h2 {
   font-size: 30px;
-}
-
-.pager {
-  background-color: #D8D8D8;
-  font-size: 25px;
-}
-
-.page_feed {
-  font-size: 25px;
-  margin: 0px;
-}
-
-.btn-good{
-  display: inline-block;
-  padding: 0 8px;
-  cursor: pointer;
-}
-.btn-good:hover{
-  color: #f44336;
-}
-.active{
-  color: #f44336;
-}
-.btn-good .active{
-  color: #f44336;
 }

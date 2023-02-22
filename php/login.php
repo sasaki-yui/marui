@@ -49,7 +49,7 @@ require("dbconnect.php");
                     <p class="error">IDもしくはパスワードが間違っています</p>
                     <?php endif; ?>
 
-                <p>パスワード<input type="password" name="password" style="width:150px" value="<?php echo htmlspecialchars($_POST['password']??"", ENT_QUOTES); ?>"></p>
+                <p>パスワード<input type="password" name="password" style="width:150px"></p>
 
                 <button type="submit" class="btn next-btn">ログイン</button>
             <br>

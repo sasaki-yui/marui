@@ -9,14 +9,15 @@ if (!empty($_POST)) {
     if ($_POST['name_sei'] === "") {
         $error['name_sei'] = "blank";
     }
-    if (strlen($_POST['name_sei'])> 20) {
+    if (strlen($_POST['name_sei'])> 60) {
         $error['name_sei'] = 'length';
     }
+    //文字数制限　20文字にしたいときは×3をして60にする
 
     if ($_POST['name_mei'] === "") {
         $error['name_mei'] = "blank";
     }
-    if (strlen($_POST['name_mei'])> 20) {
+    if (strlen($_POST['name_mei'])> 60) {
         $error['name_mei'] = 'length';
     }
 
@@ -31,7 +32,7 @@ if (!empty($_POST)) {
         $error['pref_id'] = 'not_selected';
     }
 
-    if (strlen($_POST['address'])> 100) {
+    if (strlen($_POST['address'])> 300) {
         $error['address'] = 'length';
     }
 
@@ -140,9 +141,9 @@ if (!empty($_POST)) {
 
             <div class="control">
                 <p>性別
-                    <label for="gender">
-                        <input type="radio" name="gender" value="1" <?php if( !empty($_POST['gender']) && $_POST['gender'] === "male" ){ echo 'checked'; } ?>>男性
-                        <input type="radio" name="gender" value="2" <?php if( !empty($_POST['gender']) && $_POST['gender'] === "female" ){ echo 'checked'; } ?>>女性
+                <label for="gender">
+                        <input type="radio" name="gender" value="1" <?php if(!empty($_POST['gender'] == "1" )){ echo 'checked="checked"'; } ?>>男性
+                        <input type="radio" name="gender" value="2" <?php if(!empty($_POST['gender'] == "2" )){ echo 'checked="checked"'; } ?>>女性
                     </label>
                         <?php if (isset($error['gender']) && ($error['gender'] == 'not_selected')): ?>
                         <p class="error"> ※性別を選択してください</p>
@@ -204,16 +205,19 @@ if (!empty($_POST)) {
                         );
                         ?>
                         <select name="pref_id">
-                            <option value='0'>選択してください</option>
-                            <?php foreach($prefecture as $key => $value){ ?>
-                                <option value="<?php echo $key?>"
-                                    <?php
-                                    if( !empty($_POST['pref_id']) && $_POST['pref_id'] === "" ){ echo 'selected'; }
-                                    ?>>
-                                    <?php echo $value; ?>
-                                </option>
-                                <?php 
-                            } ?>
+                        <option value='0'>選択してください</option>
+                            <?php foreach($prefecture as $key => $value) {
+                            if (!empty($_POST['pref_id'])) {
+                                        if ($key == $_POST['pref_id']) {
+                                            echo '<option value="'. $key.'"selected>'.$value.'</option>';
+                                        } else {
+                                            echo '<option value="'.$key.'">'.$value.'</option>';
+                                        }
+                                    } else {
+                                        echo '<option value="'.$key.'">'.$value.'</option>';
+                                    }
+                                }
+                            ?>
                         </select>
 
                         <?php if (isset($error['pref_id']) && ($error['pref_id'] == 'not_selected')): ?>
@@ -238,7 +242,9 @@ if (!empty($_POST)) {
                         <?php if (isset($error['password']) && ($error['password'] == "length")): ?>
                             <p class="error"> ※パスワードは8~20文字以内で入力してください</p>
                         <?php endif ?>
-                        
+                        <?php if (isset($error['password']) && ($error['password'] == "difference")): ?>
+                        <p class="error"> ※パスワードが一致しません</p>
+                        <?php endif; ?>
                         <?php if (isset($error['password']) && ($error['password'] == "include")): ?>
                             <p class="error"> ※半角英数字で入力してください</p>
                         <?php endif; ?>     

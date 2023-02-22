@@ -4,11 +4,16 @@
     //開発環境　require("../dbconnect.php");
     session_start();
 
+    if (!isset($_SESSION['join'])) {
+        header('Location: thread.php');
+        exit();
+    }
+
     if (!empty($_POST)) {
         if ($_POST['title'] === "") {
             $error['title'] = "blank";
         }
-        if (strlen($_POST['title'])> 101) {
+        if (strlen($_POST['title'])> 300) {
             $error['title'] = 'length';
         }
         
@@ -16,7 +21,7 @@
         if ($_POST['comment'] === "") {
             $error['comment'] = "blank";
         }
-        if (strlen($_POST['comment'])> 501) {
+        if (strlen($_POST['comment'])> 1500) {
             $error['comment'] = 'length';
         }
 
@@ -60,7 +65,7 @@
             <br>
             <br>
                 <label for="comment">コメント
-                        <textarea name="comment" rows="10" cols="50" wrap="hard"><?php if(!empty($_POST['comment']) ){ echo nl2br($_POST['comment']); } ?></textarea>
+                        <textarea name="comment" rows="10" cols="50"><?php if(!empty($_POST['comment']) ){ echo nl2br($_POST['comment']); } ?></textarea>
                             <?php if (!empty($error["comment"]) && $error['comment'] === 'blank'): ?>
                                 <p class="error">※コメントを入力してください</p>
                             <?php endif ?>

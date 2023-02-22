@@ -54,3 +54,7 @@ body {
 h2 {
   font-size: 30px;
 }
+
+.hidden-form {
+  display: none;
+}

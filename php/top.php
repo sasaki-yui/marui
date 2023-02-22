@@ -8,7 +8,7 @@ if (isset($_SESSION['id']) && isset($_SESSION['name_sei']) || isset($_SESSION['n
     $name_sei = $_SESSION['name_sei'];
     $name_mei = $_SESSION['name_mei'];
 } else {
-    header('Location: login.php');
+    header('Location: logout.php');
     exit();
 
     var_dump($_SESSION['id']);

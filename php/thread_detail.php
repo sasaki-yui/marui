@@ -26,12 +26,13 @@
         if ($_POST['message'] === "") {
             $error['message'] = "blank";
         }
-        if (strlen($_POST['message'])> 500) {
+        if (strlen($_POST['message'])> 1540) {
             $error['message'] = 'length';
         }
     }
 
     //コメントのデータをcomentsテーブルに挿入
+    if (!isset($error['message'])) {
         if (!empty($_POST['message'])) {
             $coments = $db->prepare('INSERT INTO coments SET member_id=?, thread_id=?, comment=?, created_at=NOW(), updated_at=NOW()');
             $coments->execute(array(
@@ -40,6 +41,7 @@
                 $_POST['message']
             ));
         }
+    }
 
     //コメント数を取得
     define('MAX','5');
@@ -120,7 +122,8 @@
                 <div class="content">
                     <h2><?php echo htmlspecialchars($threads['title']); ?></h2>
                     <p><?php echo $coments_count; ?>コメント
-                    <?php echo htmlspecialchars($threads['created_at']); ?></p>
+                    <?php $date = $threads['created_at'];
+                          echo date('n/j/y/G:i', strtotime($date)); ?></p>
                 </div>
                 <br>
                     <div class="pager">
@@ -136,63 +139,71 @@
                         <?php endif; ?>
                     </div>
                     <div class="content">
-                        <div>
-                        <p>投稿者：<?php echo htmlspecialchars($member['name_sei']).($member['name_mei']); ?>
-                        <?php echo htmlspecialchars($threads['created_at']); ?>
-                        <br>
-                        <?php echo nl2br($threads['comment']); ?></p>
+                        <div class="box">
+                            <p>投稿者：<?php echo htmlspecialchars($member['name_sei']).($member['name_mei']); ?>
+                                <?php $date = $threads['created_at'];
+                                echo date('Y.n.j G:i', strtotime($date)); ?>
+                                <br>
+                                <?php echo nl2br($threads['comment']); ?>
+                            </p>
                         </div>
-                        </div>
+                    </div>
                         <br>
                         <div class="content">
-                        <div>
-                        <?php foreach ($disp_data as $value) : ?>
-                        <div><?php echo $value['id']; ?>
-                        <?php 
-                        $like_query = $db->prepare("SELECT COUNT(*) FROM likese WHERE coments_id='".$value['id']."'");
-                        $like_query->execute();
-                        $like_count = $like_query->fetchColumn();
-                        ?></div>
-                        <div><?php echo $value['name_sei'].$value['name_mei']; ?></div>
-                        <div><?php echo $value['created_at']; ?></div>
-                        <br>
-                        <div><?php echo $value['comment']; ?></div>
-                        <br>
-                        <form action="" method="POST">
-                            <input type="hidden" value="<?=$member_id?>" name="member_id">
-                            <input type="hidden" value="<?=$value['id']?>" name="coments_id">
-                            <button type="submit" name="like" value="">♡</button>
-                        </form>
-                        <?php echo $like_count; ?>
+                            <div>
+                                <?php foreach ($disp_data as $value) : ?>
+                                    <div><?php echo $value['id']; ?>
+                                        <?php 
+                                        $like_query = $db->prepare("SELECT COUNT(*) FROM likese WHERE coments_id='".$value['id']."'");
+                                        $like_query->execute();
+                                        $like_count = $like_query->fetchColumn();
+                                        ?>
+                                    </div>
+                                    <div><?php echo $value['name_sei'].$value['name_mei']; ?></div>
+                                    <div><?php $date = $value['created_at'];
+                                        echo date('Y.n.j G:i', strtotime($date)); ?></div>
+                                    <br>
+                                    <div><?php echo $value['comment']; ?></div>
+                                    <br>
+
+                                    <form action="" method="POST">
+                                        <input type="hidden" value="<?=$member_id?>" name="member_id">
+                                        <input type="hidden" value="<?=$value['id']?>" name="coments_id">
+                                        <button type="submit" name="like" value="">♡</button>
+                                    </form>
+                                
+                                    <?php echo $like_count; ?>
+                            </div>
+                                    <br>
+                                <?php endforeach ; ?>
                         </div>
-                        <br>
-                        <?php endforeach ; ?>
-                    </div>
-                    <div class="pager">
-                        <?php if ($page >= 2): ?>
-                        <a href="/php/thread_detail.php?id=<?php echo $threads_id; ?>&page=<?php echo ($page-1); ?>"class="page_feed">前へ&raquo;</a>
-                        <?php else: ?>
-                            <span class="first_last_page">前へ&raquo;</span>
-                        <?php endif; ?>
-                        <?php if($page < $totalPage) : ?>
-                        <a href="/php/thread_detail.php?id=<?php echo $threads_id; ?>&page=<?php echo ($page+1); ?>"class="page_feed">次へ&raquo;</a>
-                        <?php else : ?>
-                            <span class="first_last_page">次へ&raquo;</span>
-                        <?php endif; ?>
-                    </div>
-        </div>
-                <form action="" method="POST" <?php if (!isset($_SESSION['id']))  :?>class="hidden-form" <?php endif ;?>>
-                <input type="hidden" value="<?=$member_id?>" name="member_id">
-                <textarea name="message" rows="10" cols="50" wrap="hard"></textarea>
-                <br>
-                <button type="submit" class="btn">コメントする</button>
-                <?php if (isset($error['message']) && ($error['message'] == "blank")): ?>
-                        <p class="error">コメントを入力してください</p>
-                        <?php endif; ?>
-                <?php if (isset($error['message']) && ($error['message'] == "length")): ?>
-                        <p class="error"> ※コメントは500文字以内で入力してください</p>
-                        <?php endif; ?>
-                </form>
+                        <div class="pager">
+                            <?php if ($page >= 2): ?>
+                            <a href="/php/thread_detail.php?id=<?php echo $threads_id; ?>&page=<?php echo ($page-1); ?>"class="page_feed">前へ&raquo;</a>
+                            <?php else: ?>
+                                <span class="first_last_page">前へ&raquo;</span>
+                            <?php endif; ?>
+                            <?php if($page < $totalPage) : ?>
+                            <a href="/php/thread_detail.php?id=<?php echo $threads_id; ?>&page=<?php echo ($page+1); ?>"class="page_feed">次へ&raquo;</a>
+                            <?php else : ?>
+                                <span class="first_last_page">次へ&raquo;</span>
+                            <?php endif; ?>
+                        </div>
+
+                        <form action="" method="POST" <?php if (!isset($_SESSION['id']))  :?>class="hidden-form" <?php endif ;?>>
+                            <input type="hidden" value="<?=$member_id?>" name="member_id">
+                            <textarea name="message" rows="10" cols="50" wrap="hard"></textarea>
+                            <br>
+                            <button type="submit" class="btn">コメントする</button>
+
+                            <?php if (isset($error['message']) && ($error['message'] == "blank")): ?>
+                                    <p class="error">コメントを入力してください</p>
+                                    <?php endif; ?>
+                            <?php if (isset($error['message']) && ($error['message'] == "length")): ?>
+                                    <p class="error"> ※コメントは500文字以内で入力してください</p>
+                                    <?php endif; ?>
+                        </form>
+
         </div>
     </body>
 </html>

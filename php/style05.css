@@ -12,6 +12,20 @@ body {
     display: none;
     margin: 20px 0;
   }
+
+  .box {
+    padding: 0.5em 200px;
+    margin: 2em 200px;
+    font-weight: bold;
+    color: #6091d3;/*文字色*/
+    background: #FFF;
+    border: solid 3px #6091d3;/*線*/
+    border-radius: 10px;/*角の丸み*/
+}
+.box p {
+    margin: 0; 
+    padding: 0;
+}
   
   #nav {
     list-style: none;

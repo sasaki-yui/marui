@@ -10,7 +10,7 @@
 
     if (isset($_POST["word"])) {
         $word = $_POST['word'];
-        $sql = $db->prepare(" SELECT * FROM threads WHERE comment LIKE '%".$word."%' OR title LIKE '%".$word."%'");
+        $sql = $db->prepare(" SELECT * FROM threads WHERE comment LIKE '%".$word."%' OR title LIKE '%".$word."%' ORDER BY created_at DESC");
         $sql->execute(array());
         $statement=$sql->fetchAll();
         }
@@ -22,23 +22,23 @@
         <meta charset="utf8mb4">
         <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0">
         <title>スレッド検索フォーム</title>
-        <link href="http://153.126.213.22/php/thread_regist.php" rel="stylesheet"/>
         <link rel="stylesheet" href="style04.css">
     </head>
     <body>
-        
         <div class="content">
-            <form action="" method="POST">
+            <form action="" method="POST" <?php if (!isset($_SESSION['id']))  :?>class="hidden-form" <?php endif ;?>>
                 <div class="menu">
-                    <ul id="nav">
-                    <li><a href="http://153.126.213.22/php/thread_regist.php">新規スレッド作成</a></li>
-                    </ul>
+                <ul id="nav">
+                <li><a href="http://153.126.213.22/php/thread_regist.php">新規スレッド作成</a></li>
+                </ul>
                 </div>
+            </form>
+            <form action="" method="POST">
                 <div class="content">
                     <input type="text" name="word">
                     <input type="submit" name="search" value="スレッド検索">
                 </div>
-            </form>
+            </form>    
                 <table>
                     <?php 
                         if (isset($statement)) 
@@ -47,12 +47,13 @@
                         <tr>
                             <td><a href="thread_detail.php?id=<?php echo $row[0]; ?>">ID:<?php echo $row[0]?>
                             <?php echo $row[2]?>
-                            <?php echo $row[4]?></a></td>
+                            <?php $date = $row[4];
+                                   echo date('Y.n.j G:i', strtotime($date)); ?></a></td>
                         </tr>
                             <?php endforeach; ?>
                 </table>
             <br>
-            <button type="button" onclick="location.href='top.php'" class="button02">トップに戻る</button> 
+            <button type="button" onclick="location.href='top.php'" class="button02">トップに戻る</button>
         </div>
     </body>
 </html>

@@ -169,9 +169,14 @@
                                     <form action="" method="POST">
                                         <input type="hidden" value="<?=$member_id?>" name="member_id">
                                         <input type="hidden" value="<?=$value['id']?>" name="coments_id">
-                                        <button type="submit" name="like" value="">♡</button>
+                                        <button type="submit" name="like" class="heart">
+                                        <?php if ($like_count > 0): ?>
+                                        ♥
+                                        <?php else: ?>
+                                        ♡
+                                        <?php endif; ?>
+                                        </button>
                                     </form>
-                                
                                     <?php echo $like_count; ?>
                             </div>
                                     <br>

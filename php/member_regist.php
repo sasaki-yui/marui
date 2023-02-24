@@ -28,9 +28,16 @@ if (!empty($_POST)) {
         $error['gender'] = 'not_selected';
     }
 
-    if ($_POST['pref_id'] =='0') {
+if ($_POST['pref_id']) {
+    $pref_num = (int)$_POST['pref_id'];
+    if ($pref_num == 0) {
         $error['pref_id'] = 'not_selected';
     }
+
+    if ($pref_num > 47) {
+        $error['pref_id'] = 'wrong_value';
+    }
+}
 
     if (strlen($_POST['address'])> 300) {
         $error['address'] = 'length';
@@ -222,6 +229,10 @@ if (!empty($_POST)) {
 
                         <?php if (isset($error['pref_id']) && ($error['pref_id'] == 'not_selected')): ?>
                         <p class="error">※都道府県は必須入力です</p>
+                        <?php endif ?>
+
+                        <?php if (isset($error['pref_id']) && ($error['pref_id'] = 'wrong_value')): ?>
+                        <p class="error">※この値は不正です</p>
                         <?php endif ?>
 
                 <br>

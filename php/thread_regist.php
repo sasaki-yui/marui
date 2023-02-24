@@ -4,7 +4,7 @@
     //開発環境　require("../dbconnect.php");
     session_start();
 
-    if (!isset($_SESSION['join'])) {
+    if (!isset($_SESSION['id'])) {
         header('Location: thread.php');
         exit();
     }

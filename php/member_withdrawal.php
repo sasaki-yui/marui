@@ -4,6 +4,11 @@ require("dbconnect.php");
 //本番環境　require("dbconnect.php");
 //開発環境　require("../dbconnect.php");
 
+if (!isset($_SESSION['id'])) {
+    header('Location: logout.php');
+    exit();
+}
+
     //deleted_atデータを挿入する
     if(isset($_POST["deleted"])) {
         if (isset($_SESSION['id'])) {
@@ -35,7 +40,7 @@ require("dbconnect.php");
 <body>
     <div class="menu">
         <ul id="nav">
-            <li><a href="http://153.126.213.22/php/login.php">トップに戻る</a></li>
+            <li><a href="http://153.126.213.22/php/top.php">トップに戻る</a></li>
         </ul>
     </div>    
     <div class="content">

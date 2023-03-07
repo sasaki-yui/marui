@@ -73,34 +73,38 @@
     $disp_data = array_slice($pre, $start_no, MAX, true);
     
     //いいねの重複チェック
+if (isset($_SESSION['id'])) {
     if (isset($_POST['like']) && isset($_POST['member_id']) && isset($_POST['coments_id'])) {
         $mem_id = (int)$_POST['member_id'];
         $com_id = (int)$_POST['coments_id'];
 
-        $like_mem = $db->prepare("SELECT id FROM likese WHERE coments_id='".$com_id."'");
+        $like_mem = $db->prepare("SELECT id FROM likese WHERE coments_id='".$com_id."' AND member_id='".$_SESSION['id']."'");
         $like_mem->execute();
-        $like_member=$like_mem->fetchColumn();
-        //本番環境のときはfetchにしてた
-        //member_id='".$mem_id."'もWHERE条件に入れていたが、消した
+        $like_id=$like_mem->fetchColumn();
 
         //重複していたらいいね削除・それ以外はデータ挿入
         if (isset($_SESSION['id'])) {
-            $id = $like_member;
-            //本番環境のときは$like_member["id"]にしてた
-        
-            if (!empty($like_member)) {
+            $id = $like_id;
+
+            if (!empty($like_id)) {
                 $delete = $db->prepare("DELETE FROM likese WHERE id=?");
                 $delete->bindValue(1, $id);
                 $delete->execute();
             } else {
                 $like = $db->prepare("INSERT INTO likese SET member_id=?, coments_id=?");
                 $like->execute(array(
-                    $mem_id,
+                    $_SESSION['id'],
                     $com_id
                 ));
             }
         }
     }
+} else {
+    if (isset($_POST['like']) && isset($_POST['member_id']) && isset($_POST['coments_id'])) {
+        header('Location: member_regist.php');
+        exit();
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -109,7 +113,6 @@
         <meta charset="utf8mb4">
         <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0">
         <title>スレッド詳細</title>
-        <link href="http://153.126.213.22/php/thread_regist.php" rel="stylesheet"/>
         <link rel="stylesheet" href="style05.css">
     </head>
     <body>
@@ -166,11 +169,19 @@
                                     <div><?php echo $value['comment']; ?></div>
                                     <br>
 
+                                    <?php 
+                                        if (isset($_SESSION['id'])) {
+                                            $like_master = $db->prepare("SELECT COUNT(*) FROM likese WHERE coments_id='".$value['id']."' AND member_id='".$_SESSION['id']."'");
+                                            $like_master->execute();
+                                            $master_count = $like_master->fetchColumn();
+                                        }
+                                        ?>
+                                    
                                     <form action="" method="POST">
                                         <input type="hidden" value="<?=$member_id?>" name="member_id">
                                         <input type="hidden" value="<?=$value['id']?>" name="coments_id">
                                         <button type="submit" name="like" class="heart">
-                                        <?php if ($like_count > 0): ?>
+                                        <?php if (isset($master_count) && $master_count > 0): ?>
                                         ♥
                                         <?php else: ?>
                                         ♡

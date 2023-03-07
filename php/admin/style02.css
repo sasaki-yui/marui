@@ -1,0 +1,47 @@
+body {
+  margin: 0;
+}
+
+.error {
+    color: red;
+}
+
+#nav {
+  list-style: none;
+  background-color:#FBE4D5;
+  overflow: hidden;
+  margin: 0;
+}
+
+#nav p {
+  font-size: 30px;
+}
+ 
+#nav li {
+  width: 140px;
+  text-align: center;
+  float: right;
+  line-height: 50px;
+  margin-right: 60px;
+}
+ 
+#nav li a {
+  text-decoration: none;
+  color: black;
+  display: block;
+  font-weight: bold;
+  border: 2px solid #333;
+  margin: 30px 10px;
+}
+
+.content {
+    background-color:#DEEAF6;
+    text-align: center;
+    height: 900px;
+    padding: 100px;
+  }
+  
+.content h1 {
+    font-size: 80px;
+    color: white;
+  }

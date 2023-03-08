@@ -1,6 +1,6 @@
 <?php
 session_start();
-require("../dbconnect.php");
+require("../../dbconnect.php");
 //本番環境　require("../dbconnect.php");
 //開発環境　require("../../dbconnect.php");
 
@@ -71,7 +71,7 @@ if (!empty($_POST)) {
             $error['email'] = 'duplicate';
         }
     }
-    if ($_POST['password'] !== $edits['password']) {
+    if (!empty($_POST['password']) && ($_POST['password'] !== $edits['password'])){
         if ($_POST['password'] === "") {
             $error['password'] = "blank";
         }
@@ -254,7 +254,7 @@ if (!empty($_POST)) {
 
             <div class="control">
                 <label for="password">パスワード</label>
-                    <input id="password" type="password" name="password" value="<?php if (!empty($edits['id'])) print $edits["password"]; ?>">
+                    <input id="password" type="password" name="password" value="">
                         <?php if (isset($error["password"]) && $error['password'] === 'blank'): ?>
                             <p class="error">※パスワードを入力してください</p>
                         <?php endif ?>
@@ -269,7 +269,7 @@ if (!empty($_POST)) {
 
             <div class="control">
                 <label for="password2">パスワード確認</label>
-                    <input id="password2" type="password" name="password2" value="<?php if (!empty($edits['id'])) print $edits["password"]; ?>">
+                    <input id="password2" type="password" name="password2" value="">
                         <?php if (isset($error["password2"]) && $error['password2'] === 'blank'): ?>
                         <p class="error">※パスワードを入力してください</p>
                         <?php endif ?>

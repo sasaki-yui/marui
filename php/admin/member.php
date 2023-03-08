@@ -6,32 +6,41 @@
 
 //会員を表示
 if (isset($_POST["search"])) {
-
     // 空の配列を用意
     $part=[];
 
     //search要素を取得
-    if (isset($_POST['search_id']) && !empty($_POST['search_id'])){
+    if (isset($_POST['search_id']) && !empty($_POST['search_id'])) {
         $part[] = " id = '".$_POST['search_id']."'";
     }
-    if (isset($_POST['search_gender']) && !empty($_POST['search_gender'])){
-        $part[] = " gender = '".$_POST['search_gender']."'";
+
+    //ひとまず男女で検索は掛けられるようになった
+    if (isset($_POST['search_gender']) && is_array($_POST['search_gender'])) {
+        $search_gender = implode(' OR ', $_POST['search_gender']);
+
+        if ($search_gender == "1" || $search_gender == "2") {
+            $part[] = " gender = '".$search_gender."'";
+        }
+        if ($search_gender == "1 OR 2") {
+            $part[] = " (gender = '1' OR gender = '2') ";
+        }
     }
-    if (isset($_POST['search_pref_id']) && $_POST['search_pref_id'] != "0"){
+
+    if (isset($_POST['search_pref_id']) && $_POST['search_pref_id'] != "0") {
         $part[] = " pref_id = '".$_POST['search_pref_id']."'";
     }
-    if (isset($_POST['search_box']) && !empty($_POST['search_box'])){
-        $part[] = " name_sei = '".$_POST['search_box']."'  OR name_mei = '".$_POST['search_box']."' OR email LIKE '%".$_POST['search_box']."%'";
+    if (isset($_POST['search_box']) && !empty($_POST['search_box'])) {
+        $part[] = " (name_sei = '".$_POST['search_box']."' || name_mei = '".$_POST['search_box']."' || email LIKE '%".$_POST['search_box']."%') ";
     }
 
     //要素を配列に入れる
     $result = implode(' AND', $part);
 
-    $query = $db->prepare("SELECT * FROM prdate WHERE $result AND deleted_at is null");
+    $query = $db->prepare("SELECT * FROM prdate WHERE deleted_at is null AND $result");
     $query->execute();
     $pre = $query->fetchAll();
 
-    $stmt = $db->prepare("SELECT COUNT(*) FROM prdate WHERE $result AND deleted_at is null");
+    $stmt = $db->prepare("SELECT COUNT(*) FROM prdate WHERE deleted_at is null AND $result");
     $stmt->execute();
     $member_count = $stmt->fetchColumn();
 
@@ -45,6 +54,24 @@ if (isset($_POST["search"])) {
     $stmt->execute();
     $member_count = $stmt->fetchColumn();
 }
+
+    //昇順・降順
+    if (isset($_POST['up'])) {
+        krsort($pre);
+    }
+    
+    if (isset($_POST['down'])) {
+        ksort($pre);
+    }
+    
+    if (isset($_POST['upup'])) {
+        krsort($pre);
+    }
+    
+    if (isset($_POST['downdown'])) {
+        ksort($pre);
+    }
+
     //会員者数を取得
     define('MAX', '10');
     $totalPage = ceil($member_count/10);
@@ -61,14 +88,6 @@ if (isset($_POST["search"])) {
     } else {
         $start_no = 0;
     }
-
-if (isset($_POST['change'])) {
-    krsort($pre);
-}
-
-if (isset($_POST['changes'])) {
-    krsort($pre);
-}
 
     //会員表示
     $disp_data = array_slice($pre, $start_no, MAX, true);
@@ -154,10 +173,10 @@ if (isset($_POST['changes'])) {
                             } ?>"></td>
                         <br><th>性別</th>
                             <td><label for="gender">
-                            <input type="checkbox" name="search_gender" value="1" <?php if(!empty($_POST['search_gender']) && $_POST['search_gender'] == "1") {
+                            <input type="checkbox" name="search_gender[]" value="1" <?php if(!empty($_POST['search_gender']) && $_POST['search_gender'] == "1") {
                                 print 'checked';
                             } ?>>男性
-                            <input type="checkbox" name="search_gender" value="2" <?php if(!empty($_POST['search_gender']) && $_POST['search_gender'] == "2") {
+                            <input type="checkbox" name="search_gender[]" value="2" <?php if(!empty($_POST['search_gender']) && $_POST['search_gender'] == "2") {
                                 print 'checked';
                             } ?>>女性
                             </label></td>
@@ -191,11 +210,15 @@ if (isset($_POST['changes'])) {
                         <!-- 会員一覧表示 -->
                         <table width="100%" border="1">
                             <tr>
-                                <th scope="col">ID<button type="submit" name="change">▼</th>
+                                <th scope="col">ID
+                                    <input type="submit" name="up" value="▲" <?php if (isset($_POST['up']))  :?>class="hidden-form" <?php endif ;?>>
+                                    <input type="submit" name="down" value="▼" <?php if (!isset($_POST['up']))  :?>class="hidden-form" <?php endif ;?>></th>
                                 <th scope="col">氏名</th>
                                 <th scope="col">性別</th>
                                 <th scope="col">住所</th>
-                                <th scope="col">登録日時<button type="submit" name="changes">▼</th>
+                                <th scope="col">登録日時
+                                    <input type="submit" name="upup" value="▲" <?php if (isset($_POST['upup']))  :?>class="hidden-form" <?php endif ;?>>
+                                    <input type="submit" name="downdown" value="▼" <?php if (!isset($_POST['upup']))  :?>class="hidden-form" <?php endif ;?>></th>
                                 <th scope="col">編集</th>
                                 <th scope="col">詳細</th>
                                 </tr>

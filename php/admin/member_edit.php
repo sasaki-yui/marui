@@ -36,8 +36,15 @@ if (!empty($_POST)) {
         $error['gender'] = 'not_selected';
     }
 
-    if ($_POST['pref_id'] =='0') {
-        $error['pref_id'] = 'not_selected';
+    if ($_POST['pref_id']) {
+        $pref_num = (int)$_POST['pref_id'];
+        if ($pref_num == 0) {
+            $error['pref_id'] = 'not_selected';
+        }
+    
+        if ($pref_num > 47) {
+            $error['pref_id'] = 'wrong_value';
+        }
     }
 
     if (strlen($_POST['address'])> 300) {
@@ -103,8 +110,8 @@ if (!empty($_POST)) {
     }
     /* エラーがなければ次のページへ */
     if (!isset($error)) {
-        $_SESSION['join'] = $_POST;   // フォームの内容をセッションで保存
-        header('Location: member_check.php');
+        $_SESSION['join'] = $_POST; 
+        header('Location: member_editcheck.php');
         exit();
     }
 }
@@ -232,6 +239,10 @@ if (!empty($_POST)) {
                         <p class="error">※都道府県は必須入力です</p>
                         <?php endif ?>
 
+                        <?php if (isset($error['pref_id']) && ($error['pref_id'] = 'wrong_value')): ?>
+                        <p class="error">※この値は不正です</p>
+                        <?php endif ?>
+
                 <br>
                             <label for="address">それ以降の住所</label>
                             <input type="text" name="address" value="<?php if (!empty($edits['id'])) print $edits["address"]; ?>">
@@ -294,6 +305,7 @@ if (!empty($_POST)) {
             <div class="control">
                 <br>
                 <button type="submit" class="button02">確認画面へ</button>
+
             </div>
         </form>
     </div>        

@@ -4,7 +4,12 @@ require("../dbconnect.php");
 //本番環境　require("../dbconnect.php");
 //開発環境　require("../../dbconnect.php");
 
-$hash = password_hash($_POST['password'], PASSWORD_DEFAULT);
+if (!isset($_SESSION['join'])) {
+    header('Location: member_regist.php');
+    exit();
+
+    $hash = password_hash($_SESSION['join']['password'], PASSWORD_DEFAULT);
+}
 
 ?>
 
@@ -23,11 +28,11 @@ $hash = password_hash($_POST['password'], PASSWORD_DEFAULT);
                 <li><h3>会員編集</h3></li>
                 <li><a href="member.php">一覧へ戻る</a></li>
             </ul>
-            <p>ID<?php echo htmlspecialchars($_POST['id']); ?></p>
+            <p>ID<?php echo htmlspecialchars($_SESSION['join']['id']); ?></p>
 
         <div class="control">
             <p>氏名
-                <?php echo $name = $_POST['name_sei'].$_POST['name_mei'];//結合
+                <?php echo $name = $_SESSION['join']['name_sei'].$_SESSION['join']['name_mei'];//結合
                     echo "<br/>\n"; 
                 ?>
             </p>
@@ -35,9 +40,9 @@ $hash = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
         <div class="control"> 
             <p>性別
-                <?php if($_POST['gender'] === "1" ){
+                <?php if($_SESSION['join']['gender'] === "1" ){
                 echo '男性';
-                    }elseif ($_POST['gender'] === "2" ) {
+                    }elseif ($_SESSION['join']['gender'] === "2" ) {
                     echo '女性';
                         }else {
                         echo '選択してください';
@@ -99,7 +104,7 @@ $hash = password_hash($_POST['password'], PASSWORD_DEFAULT);
             );
             ?>
             <p>住所
-            <?php echo $prefecture[$_POST['pref_id']].$_POST['address']; ?></p>
+            <?php echo $prefecture[$_SESSION['join']['pref_id']].$_SESSION['join']['address']; ?></p>
         </div>
 
             <div class="control">
@@ -109,19 +114,19 @@ $hash = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
             <div class="control">
                 <p>メールアドレス
-                    <?php echo htmlspecialchars($_POST['email'], ENT_QUOTES); ?></p>
+                    <?php echo htmlspecialchars($_SESSION['join']['email'], ENT_QUOTES); ?></p>
             </div>
         <br>
             <button type="submit" class="bottun02">編集完了</button>
             <input type="hidden" name="finish" value="finish">
-            <input type="hidden" name="id" value="<?=$_POST["id"] ?>">
-            <input type="hidden" name="name_sei" value="<?=$_POST['name_sei']?>">
-            <input type="hidden" name="name_mei" value="<?=$_POST['name_mei']?>">
-            <input type="hidden" name="gender" value="<?=$_POST['gender']?>">
-            <input type="hidden" name="pref_id" value="<?=$_POST['pref_id']?>">
-            <input type="hidden" name="address" value="<?=$_POST['address']?>">
-            <input type="hidden" name="password" value="<?=$_POST['password']?>">
-            <input type="hidden" name="email" value="<?=$_POST['email']?>">
+            <input type="hidden" name="id" value="<?=$_SESSION['join']["id"] ?>">
+            <input type="hidden" name="name_sei" value="<?=$_SESSION['join']['name_sei']?>">
+            <input type="hidden" name="name_mei" value="<?=$_SESSION['join']['name_mei']?>">
+            <input type="hidden" name="gender" value="<?=$_SESSION['join']['gender']?>">
+            <input type="hidden" name="pref_id" value="<?=$_SESSION['join']['pref_id']?>">
+            <input type="hidden" name="address" value="<?=$_SESSION['join']['address']?>">
+            <input type="hidden" name="password" value="<?=$_SESSION['join']['password']?>">
+            <input type="hidden" name="email" value="<?=$_SESSION['join']['email']?>">
         <br>
     </form>
 </body>

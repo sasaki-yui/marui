@@ -21,7 +21,7 @@
         if ($_POST['comment'] === "") {
             $error['comment'] = "blank";
         }
-        if (strlen($_POST['comment'])> 1500) {
+        if (strlen($_POST['comment'])> 1540) {
             $error['comment'] = 'length';
         }
 
@@ -40,7 +40,6 @@
     <meta charset="utf8mb4">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0">
     <title>スレッド作成フォーム</title>
-    <link href="http://153.126.213.22/php/member_regist.php" rel="stylesheet"/>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -65,7 +64,7 @@
             <br>
             <br>
                 <label for="comment">コメント
-                        <textarea name="comment" rows="10" cols="50"><?php if(!empty($_POST['comment']) ){ echo nl2br($_POST['comment']); } ?></textarea>
+                        <textarea name="comment" rows="10" cols="50"><?php if(!empty($_POST['comment']) ){ echo htmlspecialchars($_POST['comment']); } ?></textarea>
                             <?php if (!empty($error["comment"]) && $error['comment'] === 'blank'): ?>
                                 <p class="error">※コメントを入力してください</p>
                             <?php endif ?>
